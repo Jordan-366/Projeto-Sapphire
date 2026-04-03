@@ -20,13 +20,14 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      themeMode: ThemeMode.dark,
+      darkTheme: ThemeData.dark(),
       home: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 41, 34, 34),
         // AppBar Principal (Topo)
         appBar: AppBar(
-          backgroundColor: Colors.blue,
+          backgroundColor: Color(0xFF0D53B8),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(10),
           ),
         ),
         
@@ -40,7 +41,7 @@ class _MainAppState extends State<MainApp> {
                 height: 60,
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 decoration: BoxDecoration(
-                  color: Colors.blue,
+                  color: Color(0xFF0D53B8),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Center(
@@ -66,17 +67,15 @@ class _MainAppState extends State<MainApp> {
                     // Campo: Nome do Livro
                     TextField(
                       controller: _controllerLivro,
-                      textAlign: TextAlign.center,
                       style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
                         labelText: 'Nome do Livro',
                         labelStyle: TextStyle(color: Colors.white),
-                        floatingLabelAlignment: FloatingLabelAlignment.center,
                         enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue),
+                          borderSide: BorderSide(color: Color(0xFF0D53B8)),
                         ),
                         focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue, width: 2),
+                          borderSide: BorderSide(color: Color(0xFF0D53B8), width: 2),
                         ),
                       ),
                     ),
@@ -85,17 +84,15 @@ class _MainAppState extends State<MainApp> {
                     // Campo: Capítulo
                     TextField(
                       controller: _controllerCapitulo,
-                      textAlign: TextAlign.center,
                       style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
                         labelText: 'Capítulo',
                         labelStyle: TextStyle(color: Colors.white),
-                        floatingLabelAlignment: FloatingLabelAlignment.center,
                         enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue),
+                          borderSide: BorderSide(color: Color(0xFF0D53B8)),
                         ),
                         focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue, width: 2),
+                          borderSide: BorderSide(color: Color(0xFF0D53B8), width: 2),
                         ),
                       ),
                     ),
@@ -104,17 +101,15 @@ class _MainAppState extends State<MainApp> {
                     // Campo: Página
                     TextField(
                       controller: _controllerPagina,
-                      textAlign: TextAlign.center,
                       style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
                         labelText: 'Página',
                         labelStyle: TextStyle(color: Colors.white),
-                        floatingLabelAlignment: FloatingLabelAlignment.center,
                         enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue),
+                          borderSide: BorderSide(color: Color(0xFF0D53B8)),
                         ),
                         focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.blue, width: 2),
+                          borderSide: BorderSide(color: Color(0xFF0D53B8), width: 2),
                         ),
                       ),
                     ),
@@ -130,7 +125,7 @@ class _MainAppState extends State<MainApp> {
           onPressed: () {
             print("Livro: ${_controllerLivro.text}");
           },
-          backgroundColor: Colors.blue,
+          backgroundColor: Color(0xFF0D53B8),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
