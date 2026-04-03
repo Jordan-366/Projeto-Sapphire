@@ -26,7 +26,7 @@ class _MainAppState extends State<MainApp> {
         appBar: AppBar(
           backgroundColor: Colors.blue,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(20),
           ),
         ),
         
