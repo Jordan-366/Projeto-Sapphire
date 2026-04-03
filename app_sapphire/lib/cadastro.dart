@@ -19,7 +19,7 @@ class MainApp extends StatelessWidget {
           margin: EdgeInsets.all(80),
           alignment: Alignment.topCenter,
           decoration: BoxDecoration(
-            color: Color(0xFF172F51).withValues(alpha: 0.6),
+            color: Color(0xFF0D53B8).withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(20)
           ),//Borda arredondada
           child: Column(
