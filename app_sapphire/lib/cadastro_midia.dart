@@ -20,7 +20,7 @@ class _CadastroMidiaState extends State<CadastroMidia> {
       backgroundColor: const Color.fromARGB(255, 41, 34, 34),
       // AppBar Principal (Topo)
       appBar: AppBar(
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color(0xFF0D53B8),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
@@ -84,7 +84,7 @@ class _CadastroMidiaState extends State<CadastroMidia> {
               height: 60,
               margin: const EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: const Color(0xFF0D53B8),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Center(
@@ -136,10 +136,10 @@ class _CadastroMidiaState extends State<CadastroMidia> {
                       labelStyle: TextStyle(color: Colors.white),
                       floatingLabelAlignment: FloatingLabelAlignment.center,
                       enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.blue),
+                        borderSide: BorderSide(color: const Color(0xFF0D53B8)),
                       ),
                       focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.blue, width: 2),
+                        borderSide: BorderSide(color: const Color(0xFF0D53B8), width: 2),
                       ),
                     ),
                   ),
@@ -155,10 +155,10 @@ class _CadastroMidiaState extends State<CadastroMidia> {
                       labelStyle: TextStyle(color: Colors.white),
                       floatingLabelAlignment: FloatingLabelAlignment.center,
                       enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.blue),
+                        borderSide: BorderSide(color: const Color(0xFF0D53B8)),
                       ),
                       focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.blue, width: 2),
+                        borderSide: BorderSide(color: const Color(0xFF0D53B8), width: 2),
                       ),
                     ),
                   ),
@@ -174,7 +174,7 @@ class _CadastroMidiaState extends State<CadastroMidia> {
         onPressed: () {
           print("Livro: ${_controllerLivro.text}");
         },
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color(0xFF0D53B8),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
         ),
