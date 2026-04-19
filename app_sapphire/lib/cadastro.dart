@@ -1,18 +1,15 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
 import 'tela-inicial.dart';
 import 'db_test.dart';
 
-import 'dart:async';
+Database? _db;
 
-import 'package:flutter/widgets.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
-
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await initDatabase(database);
+  _db = await iniciarBanco();
 
   runApp(const MainApp());
 }

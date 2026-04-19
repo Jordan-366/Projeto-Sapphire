@@ -14,7 +14,12 @@ class Livro{
   Livro({required this.id, required this.nome, required this.pagina, required this.capitulo});
 
   Map<String, Object?> toMap(){
-    return {'Id': id, "Nome": nome,"Página": pagina,"Capítulo": capitulo };
+     return {
+      'id': id,
+      'nome': nome,
+      'pagina': pagina,
+      'capitulo': capitulo,
+    };
   }
 
   @override
@@ -27,9 +32,9 @@ class Livro{
 
 
 
-void main() async{
+Future<Database> iniciarBanco() async{
 
-  final database = await openDatabase(
+  return openDatabase(
     join(await getDatabasesPath(), "Sapphire_database.db"),
 
     onCreate:(db, version){
