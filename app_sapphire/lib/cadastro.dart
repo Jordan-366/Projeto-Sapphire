@@ -1,8 +1,16 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
 import 'tela-inicial.dart';
+import 'db_test.dart';
 
-void main() {
+Database? _db;
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  _db = await iniciarBanco();
+
   runApp(const MainApp());
 }
 
@@ -51,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Center(
         child: Container(
-          margin: const EdgeInsets.all(80),
+          margin: const EdgeInsets.all(40),
           alignment: Alignment.topCenter,
           decoration: BoxDecoration(
             color: const Color(0xFF0D53B8).withValues(alpha: 0.6),
