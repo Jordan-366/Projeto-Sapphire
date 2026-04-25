@@ -19,3 +19,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+http:
+  ^1.2.0
+
+shared_preferences:
+  ^2.2.0

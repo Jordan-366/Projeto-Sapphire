@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'tela-inicial.dart';
 import 'db_test.dart';
+import 'api.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Database? _db;
 
@@ -34,24 +36,51 @@ class LoginScreen extends StatefulWidget {
   _LoginScreenState createState() => _LoginScreenState();
 }
 
+
+class TokenStorage {
+  Future<void> save(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token', token);
+  }
+
+  Future<String?> get() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token');
+  }
+}
+
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _loginController = TextEditingController();
   final TextEditingController _senhaController = TextEditingController();
 
-  void _login() {
-    // Simples validação: verificar se os campos não estão vazios
-    if (_loginController.text.isNotEmpty && _senhaController.text.isNotEmpty) {
-      // Navegar para a próxima tela
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const TelaInicial()),
-      );
-    } else {
-      // Mostrar erro, por exemplo
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, preencha todos os campos')),
-      );
-    }
+  void _login() async {
+
+    if (_loginController.text.isEmpty || _senhaController.text.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Por favor, preencha todos os campos')),
+    );
+    return;
+  }
+    final token = await ApiService().login(_loginController.text, _senhaController.text);
+
+    if (token != null) {
+    // 4. salvar token
+    await TokenStorage().save(token);
+
+    print("Token salvo: $token");
+
+    // 5. navegar
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const TelaInicial()),
+    );
+  } else {
+    // erro de login
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Login inválido')),
+    );
+  }
+ 
   }
 
   @override
