@@ -1,7 +1,6 @@
 
 import 'dart:async';
 
-import 'package:flutter/widgets.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -45,4 +44,32 @@ Future<Database> iniciarBanco() async{
     version: 1,
   );
 
+}
+
+// Função para inserir um livro no banco de dados
+Future<int> inserirLivro(Livro livro) async {
+  final db = await iniciarBanco();
+  return await db.insert('livro', livro.toMap());
+}
+
+// Função para recuperar todos os livros
+Future<List<Livro>> obterTodosLivros() async {
+  final db = await iniciarBanco();
+  final List<Map<String, Object?>> livroMapa = await db.query('livro');
+  return [
+    for (final { 'id': id as int, 'nome': nome as String, 'pagina': pagina as int, 'capitulo': capitulo as int} in livroMapa)
+      Livro(id: id, nome: nome, pagina: pagina, capitulo: capitulo),
+  ];
+}
+
+// Função para atualizar um livro
+Future<int> atualizarLivro(Livro livro) async {
+  final db = await iniciarBanco();
+  return await db.update('livro', livro.toMap(), where: 'id = ?', whereArgs: [livro.id]);
+}
+
+// Função para deletar um livro
+Future<int> deletarLivro(int id) async {
+  final db = await iniciarBanco();
+  return await db.delete('livro', where: 'id = ?', whereArgs: [id]);
 }

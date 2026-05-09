@@ -1,6 +1,8 @@
+import 'dart:io' show Platform;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'tela-inicial.dart';
 import 'db_test.dart';
 import 'api.dart';
@@ -10,6 +12,11 @@ Database? _db;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
 
   _db = await iniciarBanco();
 

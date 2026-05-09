@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'tela-inicial.dart';
 import 'chat_ai.dart';
+import 'db_test.dart';
 
 class CadastroMidia extends StatefulWidget {
   const CadastroMidia({super.key});
@@ -136,10 +137,10 @@ class _CadastroMidiaState extends State<CadastroMidia> {
                       labelStyle: TextStyle(color: Colors.white),
                       floatingLabelAlignment: FloatingLabelAlignment.center,
                       enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: const Color(0xFF0D53B8)),
+                        borderSide: BorderSide(color: Color(0xFF0D53B8)),
                       ),
                       focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: const Color(0xFF0D53B8), width: 2),
+                        borderSide: BorderSide(color: Color(0xFF0D53B8), width: 2),
                       ),
                     ),
                   ),
@@ -155,10 +156,10 @@ class _CadastroMidiaState extends State<CadastroMidia> {
                       labelStyle: TextStyle(color: Colors.white),
                       floatingLabelAlignment: FloatingLabelAlignment.center,
                       enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: const Color(0xFF0D53B8)),
+                        borderSide: BorderSide(color: Color(0xFF0D53B8)),
                       ),
                       focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: const Color(0xFF0D53B8), width: 2),
+                        borderSide: BorderSide(color: Color(0xFF0D53B8), width: 2),
                       ),
                     ),
                   ),
@@ -171,8 +172,53 @@ class _CadastroMidiaState extends State<CadastroMidia> {
 
       // Floating Action Button
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          print("Livro: ${_controllerLivro.text}");
+        onPressed: () async {
+          // Validar se todos os campos estão preenchidos
+          if (_controllerLivro.text.isEmpty || _controllerCapitulo.text.isEmpty || _controllerPagina.text.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Preencha todos os campos!'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            return;
+          }
+
+          try {
+            // Criar objeto Livro com os dados do formulário
+            final novoLivro = Livro(
+              id: DateTime.now().millisecondsSinceEpoch, // Usar timestamp como ID único
+              nome: _controllerLivro.text,
+              capitulo: int.parse(_controllerCapitulo.text),
+              pagina: int.parse(_controllerPagina.text),
+            );
+
+            // Inserir no banco de dados
+            await inserirLivro(novoLivro);
+
+            // Limpar os campos após sucesso
+            _controllerLivro.clear();
+            _controllerCapitulo.clear();
+            _controllerPagina.clear();
+
+            // Mostrar mensagem de sucesso
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Livro salvo com sucesso!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+          } catch (e) {
+            // Mostrar mensagem de erro
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Erro ao salvar: $e'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
         },
         backgroundColor: const Color(0xFF0D53B8),
         shape: RoundedRectangleBorder(
