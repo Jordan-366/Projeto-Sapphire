@@ -2,20 +2,22 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final String baseUrl = "http://apiDoProfessor.com";
+  final String baseUrl = "https://mobile-ios-login.zani0x03.eti.br/api/auth/login";
 
   Future<String?> login(String usuario, String senha) async {
     final response = await http.post(
       Uri.parse(baseUrl),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
-        "usuario": usuario,
-        "senha": senha,
+        "username": usuario,
+        "password": senha,
+        "sistemaId": "95bc4a2f-2fed-4aaf-81a5-3dc05b3dee6c"
       }),
     );
 
     if (response.statusCode == 200){
       final data = jsonDecode(response.body);
+      print(data['token']);
       return data['token'];
     }
     else{
