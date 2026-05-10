@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'tela-inicial.dart';
 import 'chat_ai.dart';
+import 'db_test.dart';
 
 class CadastroMidia extends StatefulWidget {
   const CadastroMidia({super.key});
@@ -14,10 +15,51 @@ class _CadastroMidiaState extends State<CadastroMidia> {
   final TextEditingController _controllerCapitulo = TextEditingController();
   final TextEditingController _controllerPagina = TextEditingController();
 
+  Future<void> _salvarMidia() async {
+    final nome = _controllerLivro.text.trim();
+    final capituloTexto = _controllerCapitulo.text.trim();
+    final paginaTexto = _controllerPagina.text.trim();
+
+    if (nome.isEmpty || capituloTexto.isEmpty || paginaTexto.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Preencha todos os campos antes de salvar.')),
+      );
+      return;
+    }
+
+    final capitulo = int.tryParse(capituloTexto);
+    final pagina = int.tryParse(paginaTexto);
+
+    if (capitulo == null || pagina == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Capítulo e página devem ser números inteiros.')),
+      );
+      return;
+    }
+
+    final db = await iniciarBanco();
+    await db.insert(
+      'livro',
+      {
+        'nome': nome,
+        'capitulo': capitulo,
+        'pagina': pagina,
+      },
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Registro salvo com sucesso.')),
+    );
+
+    _controllerLivro.clear();
+    _controllerCapitulo.clear();
+    _controllerPagina.clear();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 41, 34, 34),
+      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
       // AppBar Principal (Topo)
       appBar: AppBar(
         backgroundColor: const Color(0xFF0D53B8),
@@ -171,9 +213,7 @@ class _CadastroMidiaState extends State<CadastroMidia> {
 
       // Floating Action Button
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          print("Livro: ${_controllerLivro.text}");
-        },
+        onPressed: _salvarMidia,
         backgroundColor: const Color(0xFF0D53B8),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),

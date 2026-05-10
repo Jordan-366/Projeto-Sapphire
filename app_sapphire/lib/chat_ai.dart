@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'api.dart';
 import 'tela-inicial.dart';
 import 'cadastro_midia.dart';
 
@@ -9,13 +11,61 @@ class ChatAI extends StatefulWidget {
   State<ChatAI> createState() => _ChatAIState();
 }
 
+class ChatMessage {
+  final String text;
+  final bool isUser;
+
+  ChatMessage({required this.text, required this.isUser});
+}
+
 class _ChatAIState extends State<ChatAI> {
   final TextEditingController _chatController = TextEditingController();
+  final List<ChatMessage> _messages = [];
+  bool _isSending = false;
+
+  Future<void> _enviarMensagem() async {
+    final prompt = _chatController.text.trim();
+    if (prompt.isEmpty || _isSending) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null || token.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Token não encontrado. Faça login novamente.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _messages.add(ChatMessage(text: prompt, isUser: true));
+      _isSending = true;
+      _chatController.clear();
+    });
+
+    final resposta = await ApiService().chat(prompt, token);
+
+    setState(() {
+      _isSending = false;
+      _messages.add(
+        ChatMessage(
+          text: resposta ?? 'Erro ao obter resposta do chatbot.',
+          isUser: false,
+        ),
+      );
+    });
+
+    if (resposta == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Não foi possível obter resposta.')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 41, 34, 34),
+      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
       appBar: AppBar(
         backgroundColor: const Color(0xFF0D53B8),
         shape: RoundedRectangleBorder(
@@ -71,19 +121,59 @@ class _ChatAIState extends State<ChatAI> {
         ),
       ),
 
-      body: const Center(
-        child: Text(
-          'As mensagens do chat aparecerão aqui...',
-          style: TextStyle(
-            color: Colors.white54,
-            fontSize: 16,
-            fontStyle: FontStyle.italic,
+      body: Column(
+        children: [
+          Expanded(
+            child: _messages.isEmpty
+                ? const Center(
+                    child: Text(
+                      'As mensagens do chat aparecerão aqui...',
+                      style: TextStyle(
+                        color: Colors.white54,
+                        fontSize: 16,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                    itemCount: _messages.length,
+                    itemBuilder: (context, index) {
+                      final message = _messages[index];
+                      return Align(
+                        alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(vertical: 6),
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: message.isUser ? const Color(0xFF0D53B8) : Colors.white12,
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: Text(
+                            message.text,
+                            style: TextStyle(
+                              color: message.isUser ? Colors.white : Colors.white70,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
           ),
-        ),
+          if (_isSending)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: LinearProgressIndicator(
+                backgroundColor: Colors.white12,
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0D53B8)),
+              ),
+            ),
+        ],
       ),
 
       bottomSheet: Container(
-        color: const Color.fromARGB(255, 41, 34, 34),
+        color: const Color.fromARGB(255, 0, 0, 0),
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom + 20,
           left: 20,
@@ -111,7 +201,7 @@ class _ChatAIState extends State<ChatAI> {
               ),
               IconButton(
                 icon: const Icon(Icons.send, color: Colors.white),
-                onPressed: () {},
+                onPressed: _isSending ? null : _enviarMensagem,
               ),
             ],
           ),
