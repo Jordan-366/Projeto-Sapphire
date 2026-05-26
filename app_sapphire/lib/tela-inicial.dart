@@ -66,19 +66,19 @@ class _TelaInicialState extends State<TelaInicial> {
     dynamic registro,
     MediaType tipo,
   ) {
-    final TextEditingController _controllerNome = TextEditingController(
+    final TextEditingController controllerNome = TextEditingController(
       text: registro.nome,
     );
-    final TextEditingController _controllerCapitulo = TextEditingController(
+    final TextEditingController controllerCapitulo = TextEditingController(
       text: tipo == MediaType.livro ? registro.capitulo.toString() : '',
     );
-    final TextEditingController _controllerPagina = TextEditingController(
+    final TextEditingController controllerPagina = TextEditingController(
       text: tipo == MediaType.livro ? registro.pagina.toString() : '',
     );
-    final TextEditingController _controllerHora = TextEditingController(
+    final TextEditingController controllerHora = TextEditingController(
       text: tipo == MediaType.filme ? registro.hora.toString() : '',
     );
-    final TextEditingController _controllerMinuto = TextEditingController(
+    final TextEditingController controllerMinuto = TextEditingController(
       text: tipo == MediaType.filme ? registro.minuto.toString() : '',
     );
 
@@ -92,28 +92,28 @@ class _TelaInicialState extends State<TelaInicial> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
-                  controller: _controllerNome,
+                  controller: controllerNome,
                   decoration: const InputDecoration(labelText: 'Nome'),
                 ),
                 if (tipo == MediaType.livro) ...[
                   TextField(
-                    controller: _controllerCapitulo,
+                    controller: controllerCapitulo,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(labelText: 'Capítulo'),
                   ),
                   TextField(
-                    controller: _controllerPagina,
+                    controller: controllerPagina,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(labelText: 'Página'),
                   ),
                 ] else ...[
                   TextField(
-                    controller: _controllerHora,
+                    controller: controllerHora,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(labelText: 'Hora'),
                   ),
                   TextField(
-                    controller: _controllerMinuto,
+                    controller: controllerMinuto,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(labelText: 'Minuto'),
                   ),
@@ -128,7 +128,7 @@ class _TelaInicialState extends State<TelaInicial> {
             ),
             TextButton(
               onPressed: () async {
-                final nome = _controllerNome.text.trim();
+                final nome = controllerNome.text.trim();
                 if (nome.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Nome não pode estar vazio')),
@@ -137,8 +137,8 @@ class _TelaInicialState extends State<TelaInicial> {
                 }
 
                 if (tipo == MediaType.livro) {
-                  final capitulo = int.tryParse(_controllerCapitulo.text);
-                  final pagina = int.tryParse(_controllerPagina.text);
+                  final capitulo = int.tryParse(controllerCapitulo.text);
+                  final pagina = int.tryParse(controllerPagina.text);
                   if (capitulo == null || pagina == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -149,8 +149,8 @@ class _TelaInicialState extends State<TelaInicial> {
                   }
                   await atualizarLivro(registro.id, nome, capitulo, pagina);
                 } else {
-                  final hora = int.tryParse(_controllerHora.text);
-                  final minuto = int.tryParse(_controllerMinuto.text);
+                  final hora = int.tryParse(controllerHora.text);
+                  final minuto = int.tryParse(controllerMinuto.text);
                   if (hora == null || minuto == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -345,7 +345,7 @@ class _TelaInicialState extends State<TelaInicial> {
                 return ListView.separated(
                   padding: const EdgeInsets.all(16),
                   itemCount: registros.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     if (_tipoSelecionado == MediaType.livro) {
                       final livro = registros[index] as Livro;
