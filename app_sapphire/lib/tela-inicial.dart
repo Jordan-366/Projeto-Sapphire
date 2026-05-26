@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'chat_ai.dart';
 import 'cadastro_midia.dart';
 import 'db_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'cadastro.dart';
 
 enum MediaType { livro, filme }
 
@@ -239,8 +241,7 @@ class _TelaInicialState extends State<TelaInicial> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
+        child: Column(
           children: <Widget>[
             const DrawerHeader(
               decoration: BoxDecoration(color: Color(0xFF0D53B8)),
@@ -249,36 +250,61 @@ class _TelaInicialState extends State<TelaInicial> {
                 style: TextStyle(color: Colors.white, fontSize: 24),
               ),
             ),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Tela Inicial'),
-              onTap: () {
-                Navigator.pop(context); // Fecha o drawer
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.chat),
-              title: const Text('Chat AI'),
-              onTap: () {
-                Navigator.pop(context); // Fecha o drawer
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ChatAI()),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.book),
-              title: const Text('Cadastro de Mídia'),
-              onTap: () {
-                Navigator.pop(context); // Fecha o drawer
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CadastroMidia(),
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: <Widget>[
+                  ListTile(
+                    leading: const Icon(Icons.home),
+                    title: const Text('Tela Inicial'),
+                    onTap: () {
+                      Navigator.pop(context); // Fecha o drawer
+                    },
                   ),
-                );
-              },
+                  ListTile(
+                    leading: const Icon(Icons.chat),
+                    title: const Text('Chat AI'),
+                    onTap: () {
+                      Navigator.pop(context); // Fecha o drawer
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ChatAI()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.book),
+                    title: const Text('Cadastro de Mídia'),
+                    onTap: () {
+                      Navigator.pop(context); // Fecha o drawer
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CadastroMidia(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: ListTile(
+                leading: const Icon(Icons.logout, color: Colors.red),
+                title: const Text('Logout', style: TextStyle(color: Colors.red)),
+                onTap: () async {
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.remove('token');
+                  await prefs.remove('current_user');
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    (route) => false,
+                  );
+                },
+              ),
             ),
           ],
         ),

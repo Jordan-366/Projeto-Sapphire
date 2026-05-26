@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Livro {
   final int id;
@@ -50,8 +51,14 @@ class Filme {
 }
 
 Future<Database> iniciarBanco() async {
+  final prefs = await SharedPreferences.getInstance();
+  String? user = prefs.getString('current_user');
+  user = (user == null || user.isEmpty) ? 'default' : user;
+  // sanitize filename: keep alphanumeric and replace others with '_'
+  final sanitized = user.replaceAll(RegExp(r'[^A-Za-z0-9]'), '_');
+
   return openDatabase(
-    join(await getDatabasesPath(), "Sapphire_database.db"),
+    join(await getDatabasesPath(), "Sapphire_database_$sanitized.db"),
     version: 2,
     onCreate: (db, version) async {
       await db.execute(

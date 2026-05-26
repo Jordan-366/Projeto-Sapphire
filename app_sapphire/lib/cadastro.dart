@@ -267,6 +267,7 @@ class LoginScreenState extends State<LoginScreen> {
   final TextEditingController _loginController = TextEditingController();
   final TextEditingController _senhaController = TextEditingController();
   final TapGestureRecognizer _cadastreseRecognizer = TapGestureRecognizer();
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -290,17 +291,29 @@ class LoginScreenState extends State<LoginScreen> {
   void _login() async {
 
     if (_loginController.text.isEmpty || _senhaController.text.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Por favor, preencha todos os campos')),
-    );
-    return;
-  }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, preencha todos os campos')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
     final token = await ApiService().login(_loginController.text, _senhaController.text);
     if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+    });
 
     if (token != null) {
       // 4. salvar token
       await TokenStorage().save(token);
+      // salvar usuário atual para banco por-usuario
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('current_user', _loginController.text);
       if (!mounted) return;
 
       // 5. navegar
@@ -314,7 +327,7 @@ class LoginScreenState extends State<LoginScreen> {
         const SnackBar(content: Text('Login inválido')),
       );
     }
- 
+
   }
 
   @override
@@ -345,6 +358,7 @@ class LoginScreenState extends State<LoginScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30),
                 child: TextField(
+                  enabled: !_isLoading,
                   controller: _loginController,
                   style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
@@ -362,6 +376,7 @@ class LoginScreenState extends State<LoginScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30),
                 child: TextField(
+                  enabled: !_isLoading,
                   controller: _senhaController,
                   obscureText: true,
                   style: const TextStyle(color: Colors.black),
@@ -377,10 +392,15 @@ class LoginScreenState extends State<LoginScreen> {
                 ),
               ),   //Entry da senha 
               const Spacer(),
-              ElevatedButton(
-                onPressed: _login,
-                child: const Text('Entrar'),
-              ),
+              _isLoading
+                  ? const SizedBox(
+                      height: 48,
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  : ElevatedButton(
+                      onPressed: _login,
+                      child: const Text('Entrar'),
+                    ),
               const SizedBox(height: 10,),
               RichText(
                 text: TextSpan(
