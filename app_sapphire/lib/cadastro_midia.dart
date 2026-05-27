@@ -119,11 +119,23 @@ class _CadastroMidiaState extends State<CadastroMidia> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Color(0xFF0D53B8)),
-              child: Text(
-                'Menu',
-                style: TextStyle(color: Colors.white, fontSize: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 120,
+              child: DrawerHeader(
+                margin: EdgeInsets.zero,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+                decoration: const BoxDecoration(color: Color(0xFF0D53B8)),
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: const Text(
+                    'Menu',
+                    style: TextStyle(color: Colors.white, fontSize: 24),
+                  ),
+                ),
               ),
             ),
             ListTile(

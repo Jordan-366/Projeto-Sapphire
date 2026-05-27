@@ -32,7 +32,9 @@ class _ChatAIState extends State<ChatAI> {
 
     if (token == null || token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Token não encontrado. Faça login novamente.')),
+        const SnackBar(
+          content: Text('Token não encontrado. Faça login novamente.'),
+        ),
       );
       return;
     }
@@ -68,23 +70,28 @@ class _ChatAIState extends State<ChatAI> {
       backgroundColor: const Color.fromARGB(255, 0, 0, 0),
       appBar: AppBar(
         backgroundColor: const Color(0xFF0D53B8),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Color(0xFF0D53B8),
-              ),
-              child: Text(
-                'Menu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
+            SizedBox(
+              width: double.infinity,
+              height: 120,
+              child: DrawerHeader(
+                margin: EdgeInsets.zero,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+                decoration: const BoxDecoration(color: Color(0xFF0D53B8)),
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: const Text(
+                    'Menu',
+                    style: TextStyle(color: Colors.white, fontSize: 24),
+                  ),
                 ),
               ),
             ),
@@ -113,7 +120,9 @@ class _ChatAIState extends State<ChatAI> {
                 Navigator.pop(context); // Fecha o drawer
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const CadastroMidia()),
+                  MaterialPageRoute(
+                    builder: (context) => const CadastroMidia(),
+                  ),
                 );
               },
             ),
@@ -136,23 +145,32 @@ class _ChatAIState extends State<ChatAI> {
                     ),
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 12,
+                    ),
                     itemCount: _messages.length,
                     itemBuilder: (context, index) {
                       final message = _messages[index];
                       return Align(
-                        alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
+                        alignment: message.isUser
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
                         child: Container(
                           margin: const EdgeInsets.symmetric(vertical: 6),
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: message.isUser ? const Color(0xFF0D53B8) : Colors.white12,
+                            color: message.isUser
+                                ? const Color(0xFF0D53B8)
+                                : Colors.white12,
                             borderRadius: BorderRadius.circular(18),
                           ),
                           child: Text(
                             message.text,
                             style: TextStyle(
-                              color: message.isUser ? Colors.white : Colors.white70,
+                              color: message.isUser
+                                  ? Colors.white
+                                  : Colors.white70,
                               fontSize: 15,
                             ),
                           ),
