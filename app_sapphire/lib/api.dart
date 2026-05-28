@@ -63,11 +63,11 @@ class ApiService {
       final content = response.body;
       try {
         final data = jsonDecode(content);
-        if (data is Map && data.containsKey('answer')) {
-          return data['answer'].toString();
+        if (data is Map && data.containsKey('response')) {
+          return data['response'].toString();
         }
       } catch (_) {
-        // não é JSON ou não tem campo answer
+        // não é JSON ou não tem campo response
       }
       return content;
     }

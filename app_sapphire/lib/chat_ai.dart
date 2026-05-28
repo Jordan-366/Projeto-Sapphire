@@ -3,6 +3,8 @@ import 'api.dart';
 import 'tela-inicial.dart';
 import 'cadastro_midia.dart';
 import 'token_storage.dart';
+import 'token_monitor.dart';
+import 'cadastro.dart';
 
 class ChatAI extends StatefulWidget {
   const ChatAI({super.key});
@@ -22,11 +24,81 @@ class _ChatAIState extends State<ChatAI> {
   final TextEditingController _chatController = TextEditingController();
   final List<ChatMessage> _messages = [];
   bool _isSending = false;
+  bool _showingExpiringWarning = false;
 
   @override
   void initState() {
     super.initState();
     TokenStorage().saveLastRoute(AppRoute.chatAI);
+    _initializeTokenMonitoring();
+  }
+
+  void _initializeTokenMonitoring() {
+    final monitor = TokenMonitorService();
+
+    monitor.onTokenExpired(() {
+      if (!mounted) return;
+      _handleTokenExpired();
+    });
+
+    monitor.onTokenExpiring((minutesRemaining) {
+      if (!mounted || _showingExpiringWarning) return;
+      _showExpiringWarning(minutesRemaining);
+    });
+
+    monitor.startMonitoring();
+  }
+
+  void _showExpiringWarning(int minutesRemaining) {
+    setState(() {
+      _showingExpiringWarning = true;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 10),
+        backgroundColor: const Color.fromARGB(255, 255, 152, 0),
+        content: Text(
+          'Seu token expirará em $minutesRemaining minutos. Faça login novamente em breve.',
+        ),
+        action: SnackBarAction(
+          label: 'OK',
+          onPressed: () {
+            setState(() {
+              _showingExpiringWarning = false;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  void _handleTokenExpired() {
+    TokenMonitorService().stopMonitoring();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        duration: Duration(seconds: 5),
+        backgroundColor: Color.fromARGB(255, 244, 67, 54),
+        content: Text('Seu token expirou. Por favor, faça login novamente.'),
+      ),
+    );
+
+    Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        (route) => false,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    TokenMonitorService().stopMonitoring();
+    _chatController.dispose();
+    super.dispose();
   }
 
   Future<void> _enviarMensagem() async {
@@ -130,6 +202,27 @@ class _ChatAIState extends State<ChatAI> {
                   ),
                 );
               },
+            ),
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: ListTile(
+                leading: const Icon(Icons.logout, color: Colors.red),
+                title: const Text(
+                  'Logout',
+                  style: TextStyle(color: Colors.red),
+                ),
+                onTap: () async {
+                  await TokenStorage().clear();
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
+                    (route) => false,
+                  );
+                },
+              ),
             ),
           ],
         ),

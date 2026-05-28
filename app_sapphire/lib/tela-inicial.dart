@@ -4,6 +4,7 @@ import 'cadastro_midia.dart';
 import 'db_test.dart';
 import 'cadastro.dart';
 import 'token_storage.dart';
+import 'token_monitor.dart';
 
 enum MediaType { livro, filme }
 
@@ -17,12 +18,83 @@ class TelaInicial extends StatefulWidget {
 class _TelaInicialState extends State<TelaInicial> {
   MediaType _tipoSelecionado = MediaType.livro;
   late Future<List<dynamic>> _futureRegistros;
+  bool _showingExpiringWarning = false;
 
   @override
   void initState() {
     super.initState();
     _futureRegistros = _carregarLivros();
     TokenStorage().saveLastRoute(AppRoute.telaInicial);
+
+    // Inicia o monitoramento de token
+    _initializeTokenMonitoring();
+  }
+
+  void _initializeTokenMonitoring() {
+    final monitor = TokenMonitorService();
+
+    monitor.onTokenExpired(() {
+      if (!mounted) return;
+      _handleTokenExpired();
+    });
+
+    monitor.onTokenExpiring((minutesRemaining) {
+      if (!mounted || _showingExpiringWarning) return;
+      _showExpiringWarning(minutesRemaining);
+    });
+
+    monitor.startMonitoring();
+  }
+
+  void _showExpiringWarning(int minutesRemaining) {
+    setState(() {
+      _showingExpiringWarning = true;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 10),
+        backgroundColor: const Color.fromARGB(255, 255, 152, 0),
+        content: Text(
+          'Seu token expirará em $minutesRemaining minutos. Faça login novamente em breve.',
+        ),
+        action: SnackBarAction(
+          label: 'OK',
+          onPressed: () {
+            setState(() {
+              _showingExpiringWarning = false;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  void _handleTokenExpired() {
+    TokenMonitorService().stopMonitoring();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        duration: Duration(seconds: 5),
+        backgroundColor: Color.fromARGB(255, 244, 67, 54),
+        content: Text('Seu token expirou. Por favor, faça login novamente.'),
+      ),
+    );
+
+    Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        (route) => false,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    TokenMonitorService().stopMonitoring();
+    super.dispose();
   }
 
   void _selecionarTipo(MediaType tipo) {

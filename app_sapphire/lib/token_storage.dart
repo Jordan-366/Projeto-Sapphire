@@ -61,6 +61,11 @@ class TokenStorage {
     return prefs.getString(_lastRouteKey);
   }
 
+  Future<int?> getTokenExpiry() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_tokenExpiryKey);
+  }
+
   Future<void> clear() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
