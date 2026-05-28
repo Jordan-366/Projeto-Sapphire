@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'api.dart';
 import 'tela-inicial.dart';
 import 'cadastro_midia.dart';
+import 'token_storage.dart';
 
 class ChatAI extends StatefulWidget {
   const ChatAI({super.key});
@@ -23,12 +23,17 @@ class _ChatAIState extends State<ChatAI> {
   final List<ChatMessage> _messages = [];
   bool _isSending = false;
 
+  @override
+  void initState() {
+    super.initState();
+    TokenStorage().saveLastRoute(AppRoute.chatAI);
+  }
+
   Future<void> _enviarMensagem() async {
     final prompt = _chatController.text.trim();
     if (prompt.isEmpty || _isSending) return;
 
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    final token = await TokenStorage().get();
 
     if (token == null || token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(

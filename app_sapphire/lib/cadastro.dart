@@ -1,27 +1,49 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'tela-inicial.dart';
+import 'chat_ai.dart';
+import 'cadastro_midia.dart';
 import 'db_test.dart';
 import 'api.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'token_storage.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await iniciarBanco();
 
-  runApp(const MainApp());
+  final token = await TokenStorage().get();
+  Widget initialPage = const LoginScreen();
+
+  if (token != null) {
+    final lastRoute = await TokenStorage().getLastRoute();
+    if (lastRoute == AppRoute.chatAI) {
+      initialPage = const ChatAI();
+    } else if (lastRoute == AppRoute.cadastroMidia) {
+      initialPage = const CadastroMidia();
+    } else {
+      initialPage = const TelaInicial();
+    }
+  }
+
+  runApp(
+    MainApp(
+      initialPage: initialPage,
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  final Widget initialPage;
+
+  const MainApp({super.key, required this.initialPage});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       themeMode: ThemeMode.dark,
       darkTheme: ThemeData.dark(),
-      home: const LoginScreen(),
+      home: initialPage,
     );
   }
 }
@@ -87,7 +109,11 @@ class RegistroScreenState extends State<RegistroScreen> {
       Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Falha no cadastro. Verifique os dados e tente novamente.')),
+        const SnackBar(
+          content: Text(
+            'Falha no cadastro. Verifique os dados e tente novamente.',
+          ),
+        ),
       );
     }
   }
@@ -251,18 +277,6 @@ class RegistroScreenState extends State<RegistroScreen> {
   }
 }
 
-class TokenStorage {
-  Future<void> save(String token) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('token', token);
-  }
-
-  Future<String?> get() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token');
-  }
-}
-
 class LoginScreenState extends State<LoginScreen> {
   final TextEditingController _loginController = TextEditingController();
   final TextEditingController _senhaController = TextEditingController();
@@ -289,7 +303,6 @@ class LoginScreenState extends State<LoginScreen> {
   }
 
   void _login() async {
-
     if (_loginController.text.isEmpty || _senhaController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor, preencha todos os campos')),
@@ -301,7 +314,10 @@ class LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
     });
 
-    final token = await ApiService().login(_loginController.text, _senhaController.text);
+    final token = await ApiService().login(
+      _loginController.text,
+      _senhaController.text,
+    );
     if (!mounted) return;
 
     setState(() {
@@ -311,9 +327,7 @@ class LoginScreenState extends State<LoginScreen> {
     if (token != null) {
       // 4. salvar token
       await TokenStorage().save(token);
-      // salvar usuário atual para banco por-usuario
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('current_user', _loginController.text);
+      await TokenStorage().saveCurrentUser(_loginController.text);
       if (!mounted) return;
 
       // 5. navegar
@@ -323,11 +337,10 @@ class LoginScreenState extends State<LoginScreen> {
       );
     } else {
       // erro de login
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login inválido')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Login inválido')));
     }
-
   }
 
   @override
@@ -339,22 +352,22 @@ class LoginScreenState extends State<LoginScreen> {
           alignment: Alignment.topCenter,
           decoration: BoxDecoration(
             color: const Color(0xFF0D53B8).withValues(alpha: 0.6),
-            borderRadius: BorderRadius.circular(20)
-          ),//Borda arredondada
+            borderRadius: BorderRadius.circular(20),
+          ), //Borda arredondada
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const SizedBox(height: 20,),
+              const SizedBox(height: 20),
               const Text(
-                "Bem vindo!", 
+                "Bem vindo!",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2
+                  letterSpacing: 1.2,
                 ),
               ), //Texto bem vindo
-              const SizedBox(height: 60,),
+              const SizedBox(height: 60),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30),
                 child: TextField(
@@ -368,11 +381,11 @@ class LoginScreenState extends State<LoginScreen> {
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                    )
+                    ),
                   ),
                 ),
-              ),//Entry do login/usuario
-              const SizedBox(height: 60,),
+              ), //Entry do login/usuario
+              const SizedBox(height: 60),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30),
                 child: TextField(
@@ -387,10 +400,10 @@ class LoginScreenState extends State<LoginScreen> {
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                    )
+                    ),
                   ),
                 ),
-              ),   //Entry da senha 
+              ), //Entry da senha
               const Spacer(),
               _isLoading
                   ? const SizedBox(
@@ -401,7 +414,7 @@ class LoginScreenState extends State<LoginScreen> {
                       onPressed: _login,
                       child: const Text('Entrar'),
                     ),
-              const SizedBox(height: 10,),
+              const SizedBox(height: 10),
               RichText(
                 text: TextSpan(
                   text: 'Não tem conta? ',
@@ -411,11 +424,11 @@ class LoginScreenState extends State<LoginScreen> {
                       text: 'Cadastre-se',
                       style: const TextStyle(color: Colors.blue),
                       recognizer: _cadastreseRecognizer,
-                    )
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(height: 10,),
+              const SizedBox(height: 10),
             ],
           ),
         ), // Fundo azul
