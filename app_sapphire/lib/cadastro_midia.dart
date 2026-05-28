@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'tela-inicial.dart';
 import 'chat_ai.dart';
 import 'db_test.dart';
+import 'token_storage.dart';
 
 enum MediaType { livro, filme }
 
@@ -20,6 +21,12 @@ class _CadastroMidiaState extends State<CadastroMidia> {
   final TextEditingController _controllerMinuto = TextEditingController();
 
   MediaType _tipoSelecionado = MediaType.livro;
+
+  @override
+  void initState() {
+    super.initState();
+    TokenStorage().saveLastRoute(AppRoute.cadastroMidia);
+  }
 
   Future<void> _salvarMidia() async {
     final nome = _controllerNome.text.trim();

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'chat_ai.dart';
 import 'cadastro_midia.dart';
 import 'db_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'cadastro.dart';
+import 'token_storage.dart';
 
 enum MediaType { livro, filme }
 
@@ -22,6 +22,7 @@ class _TelaInicialState extends State<TelaInicial> {
   void initState() {
     super.initState();
     _futureRegistros = _carregarLivros();
+    TokenStorage().saveLastRoute(AppRoute.telaInicial);
   }
 
   void _selecionarTipo(MediaType tipo) {
@@ -310,9 +311,7 @@ class _TelaInicialState extends State<TelaInicial> {
                   style: TextStyle(color: Colors.red),
                 ),
                 onTap: () async {
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.remove('token');
-                  await prefs.remove('current_user');
+                  await TokenStorage().clear();
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
